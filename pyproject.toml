@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "multi-agent"
+version = "0.1.0"
+description = "A multiagent example"
+authors = ["praveen kumar <praveenkr2208@gmail.com>"]
+license = "BSD"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langgraph = "^0.2.21"
+langchain-community = "^0.3.0"
+rich = "^13.8.1"
+llama-cpp-python = "^0.2.90"
+llamacpp = "^0.1.14"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
