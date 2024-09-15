@@ -26,8 +26,8 @@ class Agent:
 
         self.MODEL_PATH = '/teamspace/studios/this_studio/multiagent/models/Llama-3.1-Storm-8B.Q4_K_M.gguf' #Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf' 
         self.base_llm_obj = BaseLLM( model_path=self.MODEL_PATH) 
-        # self.llm = self.base_llm_obj.get_chat_llama()
-        self.llm = self.base_llm_obj.llm
+        self.llm = self.base_llm_obj.get_chat_llama()
+        # self.llm = self.base_llm_obj.llm
 
     @tool
     def get_now(format: str = "%Y-%m-%d %H:%M:%S"):
@@ -49,7 +49,7 @@ class Agent:
         Action: the action to take, should be one of [{tool_names}]
         Action Input: the input to the action
         Observation: the result of the action
-        ... (this Thought/Action/Action Input/Observation can repeat N times)
+        ... (this Thought/Action/Action Input/Observation can repeat 2 times)
         Thought: I now know the final answer
         Final Answer: the final answer to the original input question
 
