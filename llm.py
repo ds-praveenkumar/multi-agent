@@ -1,7 +1,8 @@
 from llama_cpp import Llama
-import sys
+from langchain_community.chat_models import ChatLlamaCpp
 from rich.console import Console
 from rich.markdown import Markdown
+import logging
 
 class BaseLLM:
     def __init__( self, model_path):
@@ -19,6 +20,7 @@ class BaseLLM:
                         top_p=self.top_p,
                            )
         
+        
     def display_context( self, text: str ):
         """ """
         console  = Console()
@@ -35,6 +37,19 @@ class BaseLLM:
         print("=="* 50, end='\n')
         self.display_context(output['choices'][0]['text'])
         print( "=="* 50, end='\n')
+
+    def get_chat_llama( self ):
+        """ get chat llama """
+        llm = ChatLlamaCpp(
+            model_path=self.model_path,
+            n_ctx=self.n_ctx,
+            verbose=False,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens ,
+            top_p=self.top_p,
+        )
+        logging.info(f"Chat model loaded: {self.model_path}")
+        return llm
 
 if __name__ == '__main__':
     MODEL_PATH = '/teamspace/studios/this_studio/langraph/models/Llama-3.1-Storm-8B.Q4_K_M.gguf'
