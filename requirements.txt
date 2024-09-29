@@ -1,5 +1,7 @@
-langgraph 
-langchain-community
-llama-cpp-python
-llamacpp
-
+langchain-experimental==0.0.65
+langgraph==0.2.28
+langchain-community==0.2.17
+llama-cpp-python==0.2.60
+langchain-openai==0.1.25
+graphviz
+pyppeteer
