@@ -9,6 +9,8 @@ base_url="http://localhost:11434/v1",
     top_p=1
 )
 
+
+
 if __name__ == '__main__':
     res = llm.invoke( "hi")
     print( res )
