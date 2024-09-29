@@ -12,6 +12,7 @@ from typing import Annotated, TypedDict, Union
 from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
 import logging
 
 
@@ -106,7 +107,16 @@ class Agent:
             return "end"
         else:
             return "continue"
-    
+        
+    def draw_graph( self , app: StateGraph):
+        """ Draw graph network """
+        image = app.get_graph().draw_mermaid_png(
+            draw_method=MermaidDrawMethod.API,
+            padding=10,
+        )
+        return image
+
+
     def main( self ):
 
         workflow = StateGraph(AgentState)
@@ -124,6 +134,7 @@ class Agent:
 
         workflow.add_edge("action", "agent")
         app = workflow.compile()
+        self.draw_graph(app)
         return app
     
 if __name__ == '__main__':
