@@ -1,5 +1,9 @@
 langgraph 
 langchain-community
-llama-cpp-python
-llamacpp
-
+langchain-core
+# llama-cpp-python
+# llamacpp
+loadenv
+google-genai
+langchain_google_genai
+unicodeit

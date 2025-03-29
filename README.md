@@ -12,3 +12,9 @@ pip install -r requirements.txt
 cd multiagent
 python agent.py 
 ```
+
+## Set Gemini Key
+```
+create .env file and set GEMINI_KEY=<your gemini key>
+
+```
