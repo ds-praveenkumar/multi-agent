@@ -203,11 +203,11 @@ if __name__ == '__main__':
 
     dsa_response = dsa_agent.invoke( {"input": query })
     dsa_output = ' '.join(dsa_response.content.split(','))
-    text.show( dsa_output , style='bold blue')
+    text.show( text=dsa_output , style='bold blue')
     print('=='*50)
     explainer_response = exp_agent.invoke( {"input": dsa_output })
     expainer_output = ' '.join(explainer_response.content.split(','))
-    text.show( expainer_output , style='bold green')
+    text.show( text=expainer_output , style='bold green')
     print('=='*50)
 
     markdown_response = md_agent.get_response(expainer_output )
