@@ -3,6 +3,7 @@
 ## Setup
 ```
 sh download_model.sh
+pip install --upgrade pip
 pip install -r requirements.txt
 
 ```
