@@ -13,6 +13,7 @@ console = Console()
 from utils import Display
 
 set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+
 text = Display()
 
 class PromptFactory(ABC):
@@ -27,6 +28,7 @@ class PromptFactory(ABC):
             ('human', '{input}')
         ])
         return chat_template
+
 
 class DSAPrompt(PromptFactory):
     def __init__(self):
@@ -95,12 +97,14 @@ class DSAPrompt(PromptFactory):
         Suggest coding practice problems on platforms like LeetCode, HackerRank, and GeeksforGeeks.
         """
 
+
     def prompt_messages( self ):
         messages = ChatPromptTemplate.from_messages([
             SystemMessage(content= self.role+ '\n' +self.system ),
             HumanMessage(content='input')
         ])
         return messages
+
 
 
 class TopicExplainer(PromptFactory):
@@ -211,3 +215,17 @@ if __name__ == '__main__':
 
     with open( 'agent_response.txt', 'w') as f:
         f.write( dsa_output +'\n\n' + expainer_output + '\n\n' + markdown_response + '\n\n' +pdf_gen_response)
+
+if __name__ == '__main__':
+    dsa = DSAPrompt()
+    gem = GeminiLangchain()
+    text = Display()
+    query = 'I want to learn graphs.'
+    dsa_template = dsa.prompt_template()
+    dsa_messages = dsa.prompt_messages()
+    # messages = dsa_template.invoke({'messages': query})
+    llm = dsa_template | gem.llm
+    response = llm.invoke( {"input": query })
+    concat_output = ' '.join(response.content.split(','))
+    text.show( concat_output )
+
