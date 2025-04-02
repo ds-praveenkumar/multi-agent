@@ -16,14 +16,13 @@ set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 text = Display()
 
 class PromptFactory(ABC):
-    def __init__( self ):
+    def __init__( self , ):
         self.prompt_name = None
-        self.role = None 
+        self.role = None
         self.system = None
 
-    
     def prompt_template( self ) :
-        chat_template = ChatPromptTemplate([
+        chat_template = ChatPromptTemplate.from_messages([
             ('system', self.role+ '\n' +self.system ),
             ('human', '{input}')
         ])
@@ -140,6 +139,7 @@ class PDFGenerator(PromptFactory):
         Please refer to the below text:
 
 """
+        
 
 
 class BaseAgent( ABC ):
@@ -178,9 +178,9 @@ class MarkdownAgent(BaseAgent):
 class PDFAgent(BaseAgent):
     def __init__(self, agent_name: str, prompt: PromptFactory = None):
         super().__init__(agent_name, prompt)
-        pdf_gen = PDFGenerator()
+        # pdf_gen = PDFGenerator()
         self.agent_name = prompt.prompt_name
-        self.prompt = pdf_gen.prompt_template()
+        self.prompt = prompt.prompt_template()
 
 if __name__ == '__main__':
     dsa = DSAPrompt()
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     pdf = PDFGenerator()
     gem = GeminiLangchain()
     md_agent = MarkdownAgent(md.prompt_name, md )
-    pdf_agent = PDFAgent(pdf.prompt_name, pdf) 
+    pdf_agent = PDFAgent(pdf.prompt_name, pdf)
     query = 'I want to learn graphs.'
     dsa_template = dsa.prompt_template()
     exp_template = exp.prompt_template()
@@ -204,12 +204,10 @@ if __name__ == '__main__':
     explainer_response = exp_agent.invoke( {"input": dsa_output })
     expainer_output = ' '.join(explainer_response.content.split(','))
     text.show( expainer_output , style='bold green')
-    print('=='*50) 
+    print('=='*50)
 
     markdown_response = md_agent.get_response(expainer_output )
     pdf_gen_response = pdf_agent.get_response( markdown_response, style='bold purple')
 
     with open( 'agent_response.txt', 'w') as f:
         f.write( dsa_output +'\n\n' + expainer_output + '\n\n' + markdown_response + '\n\n' +pdf_gen_response)
-
-
