@@ -14,15 +14,21 @@ from utils import Display
 
 set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
+text = Display()
+
 class PromptFactory(ABC):
-    def __init__( self ):
+    def __init__( self , ):
         self.prompt_name = None
-        self.role = None 
+        self.role = None
         self.system = None
 
-    @abstractmethod
-    def prompt_template( self  ):
-        pass
+    def prompt_template( self ) :
+        chat_template = ChatPromptTemplate.from_messages([
+            ('system', self.role+ '\n' +self.system ),
+            ('human', '{input}')
+        ])
+        return chat_template
+
 
 class DSAPrompt(PromptFactory):
     def __init__(self):
@@ -91,12 +97,6 @@ class DSAPrompt(PromptFactory):
         Suggest coding practice problems on platforms like LeetCode, HackerRank, and GeeksforGeeks.
         """
 
-    def prompt_template( self ) :
-        chat_template = ChatPromptTemplate([
-            ('system', self.role+ '\n' +self.system ),
-            ('human', '{input}')
-        ])
-        return chat_template
 
     def prompt_messages( self ):
         messages = ChatPromptTemplate.from_messages([
@@ -104,6 +104,117 @@ class DSAPrompt(PromptFactory):
             HumanMessage(content='input')
         ])
         return messages
+
+
+
+class TopicExplainer(PromptFactory):
+    def __init__( self ):
+        super().__init__()
+        self.prompt_name = 'ExpandPlan'
+        self.role = 'Your job is to understand the plan and create a notes for each Topics in the plan.'
+        self.system = """
+        For each topic in plan create a Note chapterwise and whereever possible explain it with the example of a leetcode problem.
+        Refer to the plan below:
+
+"""
+
+class MDCreater(PromptFactory):
+    def __init__(self):
+        super().__init__( )
+        self.prompt_name = 'MarkdownCreater'
+        self.role = 'Your job is to create a markdown code for topics provided.'
+        self.system = """
+        Review all the contents for each of the topic. And for each topic generate a code in markdown to be save as file.
+        Markdown code should not chage the context of the topic.
+        Please refer to the context below:
+
+"""
+
+class PDFGenerator(PromptFactory):
+    def __init__( self ):
+        super().__init__()
+        self.prompt_name = 'PDFCreaterAgent'
+        self.role = 'you are an expert in generating pdf from markdown.'
+        self.system = """
+        Your job is to split the data the text chapter wise from the markdown text received. After splitting the text topic wise. 
+        create a python code to for converting the text to pdf.
+        always output the code within ```python``` block.
+        File name should 'generated.pdf' containing all the chapters.
+        Please refer to the below text:
+
+"""
+        
+
+
+class BaseAgent( ABC ):
+    def __init__( self , agent_name: str,  prompt: PromptFactory = None ):
+        self.gem = GeminiLangchain()
+        self.agent_name = agent_name
+        self.llm = self.gem.llm
+        self.prompt = prompt
+
+    def get_llm( self ):
+        return self.prompt | self.llm
+    
+    def save_response( self , content):
+        file_name = f'{self.agent_name}.txt'
+        with open(file_name, 'w') as f:
+            f.write( content )
+            text.show(f'file saved {file_name}', style='bold purple')
+
+    def get_response( self , query, style = 'bold red'):
+        llm = self.get_llm()
+        agent_response = llm.invoke( {"input": query })
+        agent_output = ' '.join(agent_response.content.split(','))
+        text.show( agent_output , style=style)
+        self.save_response(agent_output)
+        print('=='*50)
+        return agent_output
+
+class MarkdownAgent(BaseAgent):
+    def __init__(self, agent_name: str, prompt: PromptFactory = None):
+        super().__init__(agent_name, prompt)
+        md = MDCreater()
+        self.agent_name = prompt.prompt_name
+        self.prompt = md.prompt_template()
+    
+
+class PDFAgent(BaseAgent):
+    def __init__(self, agent_name: str, prompt: PromptFactory = None):
+        super().__init__(agent_name, prompt)
+        # pdf_gen = PDFGenerator()
+        self.agent_name = prompt.prompt_name
+        self.prompt = prompt.prompt_template()
+
+if __name__ == '__main__':
+    dsa = DSAPrompt()
+    exp = TopicExplainer()
+    md = MDCreater()
+    pdf = PDFGenerator()
+    gem = GeminiLangchain()
+    md_agent = MarkdownAgent(md.prompt_name, md )
+    pdf_agent = PDFAgent(pdf.prompt_name, pdf)
+    query = 'I want to learn graphs.'
+    dsa_template = dsa.prompt_template()
+    exp_template = exp.prompt_template()
+    # messages = dsa_template.invoke({'messages': query})
+    dsa_agent = dsa_template | gem.llm
+    exp_agent = exp_template | gem.llm
+
+    dsa_response = dsa_agent.invoke( {"input": query })
+    dsa_output = ' '.join(dsa_response.content.split(','))
+    text.show( dsa_output , style='bold blue')
+    print('=='*50)
+    explainer_response = exp_agent.invoke( {"input": dsa_output })
+    expainer_output = ' '.join(explainer_response.content.split(','))
+    text.show( expainer_output , style='bold green')
+    print('=='*50)
+
+    markdown_response = md_agent.get_response(expainer_output )
+    pdf_gen_response = pdf_agent.get_response( markdown_response, style='bold purple')
+
+    with open( 'agent_response.txt', 'w') as f:
+        f.write( dsa_output +'\n\n' + expainer_output + '\n\n' + markdown_response + '\n\n' +pdf_gen_response)
 
 if __name__ == '__main__':
     dsa = DSAPrompt()
@@ -117,3 +228,4 @@ if __name__ == '__main__':
     response = llm.invoke( {"input": query })
     concat_output = ' '.join(response.content.split(','))
     text.show( concat_output )
+
