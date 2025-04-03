@@ -186,6 +186,7 @@ class PDFAgent(BaseAgent):
         self.agent_name = prompt.prompt_name
         self.prompt = prompt.prompt_template()
 
+
 if __name__ == '__main__':
     dsa = DSAPrompt()
     exp = TopicExplainer()
@@ -215,17 +216,3 @@ if __name__ == '__main__':
 
     with open( 'agent_response.txt', 'w') as f:
         f.write( dsa_output +'\n\n' + expainer_output + '\n\n' + markdown_response + '\n\n' +pdf_gen_response)
-
-if __name__ == '__main__':
-    dsa = DSAPrompt()
-    gem = GeminiLangchain()
-    text = Display()
-    query = 'I want to learn graphs.'
-    dsa_template = dsa.prompt_template()
-    dsa_messages = dsa.prompt_messages()
-    # messages = dsa_template.invoke({'messages': query})
-    llm = dsa_template | gem.llm
-    response = llm.invoke( {"input": query })
-    concat_output = ' '.join(response.content.split(','))
-    text.show( concat_output )
-

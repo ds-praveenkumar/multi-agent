@@ -8,8 +8,8 @@ class Display:
     def __init__(self, ):
         self.text = None
 
-    def show( self, text: str ):
+    def show( self, text, style: str= "bold blue" ):
         """ display text """
         console  = Console()
         md = Markdown(text)
-        console.print( md, style="bold blue")
+        console.print( md, style=style)
